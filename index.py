@@ -11,11 +11,14 @@ class GeminiAPI:
             return {"error": "Inappropriate content detected"}
         
         url = f"{self.base_url}/search?query={query}&key={self.api_key}"
-        response = requests.get(url)
-        if response.status_code == 200:
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an HTTPError for bad responses
             return self.process_response(response.json())
-        else:
-            return {"error": response.status_code, "message": response.text}
+        except requests.exceptions.HTTPError as http_err:
+            return {"error": "HTTP error occurred", "message": str(http_err)}
+        except Exception as err:
+            return {"error": "Other error occurred", "message": str(err)}
 
     def is_inappropriate(self, query):
         inappropriate_keywords = ["racism", "hacking", "sexual"]
