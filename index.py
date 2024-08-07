@@ -1,10 +1,12 @@
+import os
 import requests
 import re
+from flask import Flask, request, jsonify
 
 class GeminiAPI:
     def __init__(self, api_key):
         self.api_key = api_key
-        self.base_url = "https://api.gemini.com"  # Updated base URL
+        self.base_url = "https://api.gemini.com"
 
     def search(self, query):
         if self.is_inappropriate(query):
@@ -29,7 +31,19 @@ class GeminiAPI:
         # This is a placeholder for actual processing logic
         return response
 
+api_key = os.getenv("YOUR_API_KEY")
+api = GeminiAPI(api_key)
+
+app = Flask(__name__)
+
+@app.route('/search', methods=['GET'])
+def handler():
+    query = request.args.get('query')
+    if not query:
+        return jsonify({"error": "Missing query parameter"}), 400
+    
+    result = api.search(query)
+    return jsonify(result)
+
 if __name__ == "__main__":
-    api = GeminiAPI("YOUR_API_KEY")
-    result = api.search("example query")
-    print(result)
+    app.run(debug=True)
