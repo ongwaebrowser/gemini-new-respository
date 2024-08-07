@@ -32,6 +32,9 @@ class GeminiAPI:
         return response
 
 api_key = os.getenv("YOUR_API_KEY")
+if not api_key:
+    raise ValueError("No API key found. Please set the YOUR_API_KEY environment variable.")
+
 api = GeminiAPI(api_key)
 
 app = Flask(__name__)
